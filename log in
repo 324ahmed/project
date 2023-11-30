@@ -14,7 +14,7 @@ class Login:
         self.fontSize="4"
 
         self.login_win=tkinter.Tk()
-        self.login_win.config(bg="#403e3e")
+        self.login_win.config(bg="light green")
 
         self.login_win.title("Ksu Payment")
         self.login_win.geometry("700x350")
@@ -96,6 +96,9 @@ class Login:
             #     self.login_win.destroy()
             #     import Admin
             #     Admin.Admin()
+            #
+            # else:
+... (29 lines left)
             #
             # else:
 ... (29 lines left)
