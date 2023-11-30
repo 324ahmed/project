@@ -1,0 +1,46 @@
+from tkinter import *
+import Signup as su
+
+class Window:
+    p = False
+    def __init__(self, master):
+        self.master = master
+        master.title("Golf Cart Information")
+        master.geometry("800x600")
+        master.configure(bg='light blue')
+
+        self.label1 = Label(master, text="Golf Cart Plate ID Number:")
+        self.label1.pack()
+        self.entry1 = Entry(master)
+        self.entry1.pack()
+        self.label2 = Label(master, text="College name:")
+        self.label2.pack()
+        self.entry2 = Entry(master)
+        self.entry2.pack()
+        self.button1 = Button(master, text="Create", command=self.create)
+        self.button1.pack()
+        self.button2 = Button(master, text="Logout", command=self.logout)
+        self.button2.pack()
+        self.button3 = Button(master, text="Backup", command=self.backup)
+        self.button3.pack()
+
+    def create(self):
+        PN = self.entry1.get()
+        CN = self.entry2.get()
+
+
+    def logout(self):
+        root.destroy()
+        p=True
+        if p==True:
+         su.window.mainloop()
+
+        pass
+
+    def backup(self):
+        # Code to backup the central database
+        pass
+
+root = Tk()
+my_window = Window(root)
+root.mainloop()
