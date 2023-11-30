@@ -1,0 +1,47 @@
+import sqlite3
+import random
+import datetime
+import csv
+
+
+def create():
+    conn=sqlite3.connect("KSU_payment.db")
+    print("Opened database successfully")
+
+    try:
+        conn.executescript('''
+            CREATE TABLE ACCOUNT
+                ( 
+                    ID             TEXT    NOT NULL,
+                    FirstName     TEXT           NOT NULL,
+                    LastName       TEXT           NOT NULL,
+                    Password        TEXT           NOT NULL,
+                    email           TEXT           NOT NULL,
+                    PhoneNum       VARCHAR(10)     NOT NULL,
+                    AccType      VARCHAR(20) NOT NULL,
+                    PRIMARY KEY (AccID),
+                    UNIQUE(email),
+                    UNIQUE(PhoneNum) 
+
+                );
+
+            CREATE TABLE WALLET
+                ( 
+                    WalletNum    INT             NOT NULL, 
+                    DATE_TIME       DATETIME        NOT NULL,
+                    BALANCE         FLOAT           NOT NULL, 
+                    WalletType         VARCHAR(20)  NOT NULL,
+                    AccId          TEXT              NULL,             
+                    EntityName          TEXT,
+                    PRIMARY KEY(WalletNum)
+                    FOREIGN KEY(AccId) REFERENCES ACCOUNT(AccId)
+                );
+
+
+           ''')
+        print("Table created successfully")
+        conn.close()
+
+
+    except sqlite3.OperationalError:
+        print('** Database has been created previously')
