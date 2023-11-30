@@ -1,46 +1,51 @@
-from tkinter import *
-import Signup as su
+import tkinter as tk
 
-class Window:
-    p = False
-    def __init__(self, master):
-        self.master = master
-        master.title("Golf Cart Information")
-        master.geometry("800x600")
-        master.configure(bg='light blue')
+class Admin:
+    def __init__(self):
+        self.window = tk.Tk()
+        self.window.title("Admin")
+        self.window.geometry('800x800')
+        self.window.configure(bg='#374aa1')
 
-        self.label1 = Label(master, text="Golf Cart Plate ID Number:")
-        self.label1.pack()
-        self.entry1 = Entry(master)
-        self.entry1.pack()
-        self.label2 = Label(master, text="College name:")
-        self.label2.pack()
-        self.entry2 = Entry(master)
-        self.entry2.pack()
-        self.button1 = Button(master, text="Create", command=self.create)
-        self.button1.pack()
-        self.button2 = Button(master, text="Logout", command=self.logout)
-        self.button2.pack()
-        self.button3 = Button(master, text="Backup", command=self.backup)
-        self.button3.pack()
+        # Golf cart plate number
+        self.labelPlateNumber = tk.Label(self.window, text="Golf cart plate number",font=("Arial MS", 12, "bold"),bg='#374aa1')
+        self.labelPlateNumber.pack()
+        self.entryPlateNumber = tk.Entry(self.window)
+        self.entryPlateNumber.pack()
+
+        # College
+        self.labelCollege = tk.Label(self.window, text="College",font=("Arial MS", 12, "bold"),bg='#374aa1')
+        self.labelCollege.pack()
+        self.entryCollege = tk.Entry(self.window)
+        self.entryCollege.pack()
+
+        # Create button
+        self.buttonCreate = tk.Button(self.window, text="Create", command=self.create,font=("Arial MS", 12, "bold"),bg='#374aa1')
+        self.buttonCreate.pack()
+
+        # Logout button
+        self.buttonLogout = tk.Button(self.window, text="Logout", command=self.logout,font=("Arial MS", 12, "bold"),bg='#374aa1')
+        self.buttonLogout.pack()
+
+        # Backup button
+        self.buttonBackup = tk.Button(self.window, text="Backup", command=self.backup,font=("Arial MS", 12, "bold"),bg='#374aa1')
+        self.buttonBackup.pack()
+
+        self.window.mainloop()
 
     def create(self):
-        PN = self.entry1.get()
-        CN = self.entry2.get()
-
+        # The system sends this information to the central database.
+        # Here, we just display a message box to indicate successful submission.
+        tk.messagebox.showinfo("Success", "Information submitted successfully")
 
     def logout(self):
-        root.destroy()
-        p=True
-        if p==True:
-         su.window.mainloop()
-
-        pass
+        self.window.destroy()
+        import Signup
+        Signup.Signup()
 
     def backup(self):
-        # Code to backup the central database
-        pass
+        # The system backups all information of the central database into a CSV file format.
+        # Here, we just display a message box to indicate successful backup.
+        tk.messagebox.showinfo("Success", "Backup completed successfully")
 
-root = Tk()
-my_window = Window(root)
-root.mainloop()
+Admin()
