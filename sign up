@@ -1,128 +1,175 @@
 import tkinter as tk
-import sqlite3
-import shutil
 from tkinter import messagebox
-import csv
+import hashlib
 
-class Admin:
+
+class SignUp:
     def __init__(self):
-        self.window = tk.Tk()
-        self.window.title("Admin")
-        self.window.geometry('800x800')
-        self.window.configure(bg='#374aa1')
+        self.signup_win = tk.Tk()
+        self.signup_win.title("Sign Up")
+        self.signup_win.geometry("300x400")
 
-        # Golf cart plate number
-        self.labelPlateNumber = tk.Label(self.window, text="Golf cart plate number", font=("Arial MS", 12, "bold"), bg='#374aa1')
-        self.labelPlateNumber.pack()
-        self.entryPlateNumber = tk.Entry(self.window)
-        self.entryPlateNumber.pack()
+        self.label_first_name = tk.Label(self.signup_win, text="First Name:")
+        self.label_first_name.pack()
 
-        # College
-        self.labelCollege = tk.Label(self.window, text="College", font=("Arial MS", 12, "bold"), bg='#374aa1')
-        self.labelCollege.pack()
-        self.entryCollege = tk.Entry(self.window)
-        self.entryCollege.pack()
+        self.first_name_entry = tk.Entry(self.signup_win)
+        self.first_name_entry.pack()
 
-        # Create button
-        self.buttonCreate = tk.Button(self.window, text="Create", command=self.create, font=("Arial MS", 12, "bold"), bg='#374aa1')
-        self.buttonCreate.pack()
+        self.label_last_name = tk.Label(self.signup_win, text="Last Name:")
+        self.label_last_name.pack()
 
-        # Logout button
-        self.buttonLogout = tk.Button(self.window, text="Logout", command=self.logout, font=("Arial MS", 12, "bold"), bg='#374aa1')
-        self.buttonLogout.pack()
+        self.last_name_entry = tk.Entry(self.signup_win)
+        self.last_name_entry.pack()
 
-        # Backup button
-        self.buttonBackup = tk.Button(self.window, text="Backup", command=self.backup, font=("Arial MS", 12, "bold"), bg='#374aa1')
-        self.buttonBackup.pack()
+        self.label_user_class = tk.Label(self.signup_win, text="User Class:")
+        self.label_user_class.pack()
 
-        self.window.mainloop()
+        self.user_class_var = tk.StringVar(self.signup_win)
+        self.user_class_var.set("Student")
+        self.user_class_option = tk.OptionMenu(self.signup_win, self.user_class_var, "Student", "Faculty", "Employee")
+        self.user_class_option.pack()
 
-    def create(self):
-        plate_number = self.entryPlateNumber.get()
-        college = self.entryCollege.get()
-        if plate_number and college:
-            create(plate_number, college)
-            self.entryPlateNumber.delete(0, tk.END)
-            self.entryCollege.delete(0, tk.END)
-        else:
-            messagebox.showinfo("Error", "Please enter both the plate number and college.")
+        self.label_id = tk.Label(self.signup_win, text="ID Number:")
+        self.label_id.pack()
 
-    def logout(self):
-        self.window.destroy()
-        import Signup
-        Signup.Signup()
+        self.id_entry = tk.Entry(self.signup_win)
+        self.id_entry.pack()
 
-    def backup(self):
-        try:
-            conn = sqlite3.connect("KSU_payment.db")
-            cursor = conn.cursor()
+        self.label_password = tk.Label(self.signup_win, text="Password:")
+        self.label_password.pack()
 
-            cursor.execute("SELECT * FROM GOLF_CART")
-            data = cursor.fetchall()
+        self.password_entry = tk.Entry(self.signup_win, show="*")
+        self.password_entry.pack()
 
-            with open("KSU_payment_backup.csv", mode="w", newline="") as file:
-                writer = csv.writer(file)
-                writer.writerows(data)
+        self.label_email = tk.Label(self.signup_win, text="Email Address:")
+        self.label_email.pack()
 
-            messagebox.showinfo("Success", "Backup completed successfully")
-        except IOError as e:
-            messagebox.showerror("Error", f"Backup failed: {str(e)}")
-        finally:
-            if cursor:
-                cursor.close()
-            if conn:
-                conn.close()
+        self.email_entry = tk.Entry(self.signup_win)
+        self.email_entry.pack()
 
-def create_tables():
-    conn = sqlite3.connect("KSU_payment.db")
-    print("Opened database successfully")
+        self.label_phone = tk.Label(self.signup_win, text="Phone Number:")
+        self.label_phone.pack()
 
-    try:
-        conn.executescript('''
-            CREATE TABLE IF NOT EXISTS ACCOUNT
-            ( 
-                ID          TEXT     NOT NULL,
-                FirstName   TEXT     NOT NULL,
-                LastName    TEXT     NOT NULL,
-                Password    TEXT     NOT NULL,
-                email       TEXT     NOT NULL,
-                PhoneNum    VARCHAR(10) NOT NULL,
-                AccType     VARCHAR(20) NOT NULL,
-                PRIMARY KEY (ID),
-                UNIQUE(email),
-                UNIQUE(PhoneNum) 
-            );
+        self.phone_entry = tk.Entry(self.signup_win)
+        self.phone_entry.pack()
 
-            CREATE TABLE IF NOT EXISTS GOLF_CART
-            ( 
-                PlateNumber TEXT     NOT NULL, 
-                College     TEXT     NOT NULL,
-                PRIMARY KEY (PlateNumber)
-            );
-        ''')
-        print("Tables created successfully")
-        conn.close()
-    except sqlite3.Error as e:
-        print("Error: ", e)
+        self.submit_button = tk.Button(self.signup_win, text="Submit", command=self.submitForm)
+        self.submit_button.pack()
 
-def create(plate_number, college):
-    conn = sqlite3.connect("KSU_payment.db")
-    print("Opened database successfully")
+        self.login_button = tk.Button(self.signup_win, text="Login", command=self.openLogin)
+        self.login_button.pack()
 
-    try:
-        conn.execute("INSERT INTO GOLF_CART (PlateNumber, College) VALUES (?, ?)",
-                     (plate_number, college))
-        conn.commit()
+    def submitForm(self):
+        first_name = self.first_name_entry.get()
+        last_name = self.last_name_entry.get()
+        user_class = self.user_class_var.get()
+        id_num = self.id_entry.get()
+        password = self.password_entry.get()
+        email = self.email_entry.get()
+        phone = self.phone_entry.get()
 
-        print("Data sent to the database successfully")
-    except sqlite3.Error as e:
-        print("Error: ", e)
+        # Validate input
+        if not first_name or not last_name or not id_num or not password or not email or not phone:
+            messagebox.showerror("Error", "Please fill in all fields.")
+            return
 
-    conn.close()
+        if user_class == "Student" and len(id_num) != 10:
+            messagebox.showerror("Error", "Student ID should be 10 digits.")
+            return
+        elif user_class != "Student" and len(id_num) != 6:
+            messagebox.showerror("Error", "ID should be 6 digits for Faculty or Employee.")
+            return
 
-# Create the tables if they don't exist
-create_tables()
+        if len(password) < 6:
+            messagebox.showerror("Error", "Password should be at least 6 characters long.")
+            return
 
-# Start the admin interface
-Admin()
+        if not email.endswith("@ksu.edu.sa"):
+            messagebox.showerror("Error", "Email address should end with @ksu.edu.sa.")
+            return
+
+        if not phone.startswith("05") or len(phone) != 10:
+            messagebox.showerror("Error", "Phone number should start with 05 and be 10 digits long.")
+            return
+
+        # Connect to the central database and check if the user is already registered
+        # ...
+
+        # Hash the password
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
+
+        # Insert user information into the database
+        # ...
+
+        messagebox.showinfo("Success", "Registration successful!")
+        self.clearFields()
+
+    def clearFields(self):
+        self.first_name_entry.delete(0, tk.END)
+        self.last_name_entry.delete(0, tk.END)
+        self.id_entry.delete(0, tk.END)
+        self.password_entry.delete(0, tk.END)
+        self.email_entry.delete(0, tk.END)
+        self.phone_entry.delete(0, tk.END)
+
+    def openLogin(self):
+        self.signup_win.destroy()
+        login = Login()
+        login.login_win.mainloop()
+
+
+class Login:
+    def __init__(self):
+        self.login_win = tk.Tk()
+        self.login_win.title("Login")
+        self.login_win.geometry("300x300")
+
+        self.label_id = tk.Label(self.login_win, text="ID:")
+        self.label_id.pack()
+
+        self.id_entry = tk.Entry(self.login_win)
+        self.id_entry.pack()
+
+        self.label_password = tk.Label(self.login_win, text="Password:")
+        self.label_password.pack()
+
+        self.password_entry = tk.Entry(self.login_win, show="*")
+        self.password_entry.pack()
+
+        self.login_button = tk.Button(self.login_win, text="Login", command=self.login)
+        self.login_button.pack()
+
+        self.signup_button = tk.Button(self.login_win, text="Sign Up", command=self.openSignUp)
+        self.signup_button.pack()
+
+    def login(self):
+        id_num = self.id_entry.get()
+        password = self.password_entry.get()
+
+        # Validate input
+        if not id_num or not password:
+            messagebox.showerror("Error", "Please enter ID and password.")
+            return
+
+        # Connect to the central database and check if the user exists and the password is correct
+        # ...
+
+        # If login is successful, perform the necessary actions
+        # ...
+
+        messagebox.showinfo("Success", "Login successful!")
+        self.clearFields()
+
+    def clearFields(self):
+        self.id_entry.delete(0, tk.END)
+        self.password_entry.delete(0, tk.END)
+
+    def openSignUp(self):
+        self.login_win.destroy()
+        signup = SignUp()
+        signup.signup_win.mainloop()
+
+
+login = Login()
+login.login_win.mainloop()
 
