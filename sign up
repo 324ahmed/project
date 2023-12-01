@@ -1,80 +1,128 @@
 import tkinter as tk
-import re
+import sqlite3
+import shutil
+from tkinter import messagebox
+import csv
 
-class Signup:
+class Admin:
     def __init__(self):
-
-        self.window=tk.Tk()
-        self.window.title("Sign up")
+        self.window = tk.Tk()
+        self.window.title("Admin")
         self.window.geometry('800x800')
         self.window.configure(bg='#374aa1')
 
+        # Golf cart plate number
+        self.labelPlateNumber = tk.Label(self.window, text="Golf cart plate number", font=("Arial MS", 12, "bold"), bg='#374aa1')
+        self.labelPlateNumber.pack()
+        self.entryPlateNumber = tk.Entry(self.window)
+        self.entryPlateNumber.pack()
 
+        # College
+        self.labelCollege = tk.Label(self.window, text="College", font=("Arial MS", 12, "bold"), bg='#374aa1')
+        self.labelCollege.pack()
+        self.entryCollege = tk.Entry(self.window)
+        self.entryCollege.pack()
 
+        # Create button
+        self.buttonCreate = tk.Button(self.window, text="Create", command=self.create, font=("Arial MS", 12, "bold"), bg='#374aa1')
+        self.buttonCreate.pack()
 
-        # First Name
-        self.labelFirstName = tk.Label(self.window, text="First Name", font=("Arial MS", 12, "bold"),bg='#374aa1')
-        self.labelFirstName.pack()
-        self.entryFirstName = tk.Entry(self.window)
-        self.entryFirstName.pack()
+        # Logout button
+        self.buttonLogout = tk.Button(self.window, text="Logout", command=self.logout, font=("Arial MS", 12, "bold"), bg='#374aa1')
+        self.buttonLogout.pack()
 
-        # Last Name
-        self.labelLastName = tk.Label(self.window, text="Last Name", font=("Arial MS", 12, "bold"),bg='#374aa1')
-        self.labelLastName.pack()
-        self.entryLastName = tk.Entry(self.window)
-        self.entryLastName.pack()
-
-        # User Class
-        self.labelUserClass = tk.Label(self.window, text="User Class", font=("Arial MS", 12, "bold"),bg='#374aa1')
-        self.labelUserClass.pack()
-        self.entryUserClass = tk.Entry(self.window)
-        self.entryUserClass.pack()
-
-        # Student ID number
-        self.labelStudentID = tk.Label(self.window, text="Student ID number (10 digits) or 6 Digits for Faculty and Employee", font=("Arial MS", 12, "bold"),bg='#374aa1')
-        self.labelStudentID.pack()
-        self.entryStudentID = tk.Entry(self.window)
-        self.entryStudentID.pack()
-
-        # Password
-        self.labelPassword = tk.Label(self.window, text="The password must be 6 at minimum)", font=("Arial MS", 12, "bold"),bg='#374aa1')
-        self.labelPassword.pack()
-        self.entryPassword = tk.Entry(self.window)
-        self.entryPassword.pack()
-
-        # Email address
-        self.labelEmail = tk.Label(self.window, text="Email address", font=("Arial MS", 12, "bold"),bg='#374aa1')
-        self.labelEmail.pack()
-        self.entryEmail = tk.Entry(self.window)
-        self.entryEmail.pack()
-
-        # Phone number
-        self.labelPhone = tk.Label(self.window, text="User phone number",font=("Arial MS", 12, "bold"),bg='#374aa1')
-        self.labelPhone.pack()
-        self.entryPhone = tk.Entry(self.window)
-        self.entryPhone.pack()
-
-        # Submit button
-        self.buttonSubmit = tk.Button(self.window, text="Submit", command=self.submit, font=("Arial MS", 12, "bold"))
-        self.buttonSubmit.pack()
-
-        # Login button
-        self.buttonLogin = tk.Button(self.window, text="Login", command=self.go_Login, font=("Arial MS", 12, "bold"))
-        self.buttonLogin.pack()
+        # Backup button
+        self.buttonBackup = tk.Button(self.window, text="Backup", command=self.backup, font=("Arial MS", 12, "bold"), bg='#374aa1')
+        self.buttonBackup.pack()
 
         self.window.mainloop()
 
-    def submit(self):
-        student_id=self.entryStudentID.get()
-        pattern=r"^\d{6}|\d{10}$"
+    def create(self):
+        plate_number = self.entryPlateNumber.get()
+        college = self.entryCollege.get()
+        if plate_number and college:
+            create(plate_number, college)
+            self.entryPlateNumber.delete(0, tk.END)
+            self.entryCollege.delete(0, tk.END)
+        else:
+            messagebox.showinfo("Error", "Please enter both the plate number and college.")
 
-        if not re.match(pattern, student_id):
-            tk.messagebox.showerror("Error", "Invalid Student ID number")
-            return
-
-    def go_Login(self):
+    def logout(self):
         self.window.destroy()
-        import Login
-        Login.Login()
+        import Signup
+        Signup.Signup()
 
-Signup()
+    def backup(self):
+        try:
+            conn = sqlite3.connect("KSU_payment.db")
+            cursor = conn.cursor()
+
+            cursor.execute("SELECT * FROM GOLF_CART")
+            data = cursor.fetchall()
+
+            with open("KSU_payment_backup.csv", mode="w", newline="") as file:
+                writer = csv.writer(file)
+                writer.writerows(data)
+
+            messagebox.showinfo("Success", "Backup completed successfully")
+        except IOError as e:
+            messagebox.showerror("Error", f"Backup failed: {str(e)}")
+        finally:
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()
+
+def create_tables():
+    conn = sqlite3.connect("KSU_payment.db")
+    print("Opened database successfully")
+
+    try:
+        conn.executescript('''
+            CREATE TABLE IF NOT EXISTS ACCOUNT
+            ( 
+                ID          TEXT     NOT NULL,
+                FirstName   TEXT     NOT NULL,
+                LastName    TEXT     NOT NULL,
+                Password    TEXT     NOT NULL,
+                email       TEXT     NOT NULL,
+                PhoneNum    VARCHAR(10) NOT NULL,
+                AccType     VARCHAR(20) NOT NULL,
+                PRIMARY KEY (ID),
+                UNIQUE(email),
+                UNIQUE(PhoneNum) 
+            );
+
+            CREATE TABLE IF NOT EXISTS GOLF_CART
+            ( 
+                PlateNumber TEXT     NOT NULL, 
+                College     TEXT     NOT NULL,
+                PRIMARY KEY (PlateNumber)
+            );
+        ''')
+        print("Tables created successfully")
+        conn.close()
+    except sqlite3.Error as e:
+        print("Error: ", e)
+
+def create(plate_number, college):
+    conn = sqlite3.connect("KSU_payment.db")
+    print("Opened database successfully")
+
+    try:
+        conn.execute("INSERT INTO GOLF_CART (PlateNumber, College) VALUES (?, ?)",
+                     (plate_number, college))
+        conn.commit()
+
+        print("Data sent to the database successfully")
+    except sqlite3.Error as e:
+        print("Error: ", e)
+
+    conn.close()
+
+# Create the tables if they don't exist
+create_tables()
+
+# Start the admin interface
+Admin()
+
