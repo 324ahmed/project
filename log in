@@ -20,78 +20,39 @@ class Login:
         self.password_entry = tk.Entry(self.login_win, show="*")
         self.password_entry.pack()
 
-        self.login_button = tk.Button(self.login_win, text="Login", command=self.authenticate)
+        self.login_button = tk.Button(self.login_win, text="Login", command=self.login)
         self.login_button.pack()
 
-    def authenticate(self):
+
+    def login(self):
         id_num = self.id_entry.get()
         password = self.password_entry.get()
 
         # Validate input
         if not id_num or not password:
-            messagebox.showerror("Error", "Please enter both ID and password.")
+            messagebox.showerror("Error", "Please enter ID and password.")
             return
+
 
         if id_num == "admin" and password == "adminpassword":
-            admin = Admin()
-            admin.openAdminWindow()
             self.login_win.destroy()
+            import admin
+            admin_instance = admin.Admin()
             return
 
-        if not id_num.isdigit():
-            messagebox.showerror("Error", "ID should be digits only.")
-            return
-
-        if len(id_num) != 10 and len(id_num) != 6:
-            messagebox.showerror("Error", "ID should be 10 digits for students or 6 digits for faculty/employees.")
-            return
-
-        # Connect to the central database and check the credentials
-        # ...
-
-        # Hash the entered password and compare with the stored hash in the database
-        hashed_password = hashlib.sha256(password.encode()).hexdigest()
-
-        # Compare the hashed password with the one stored in the database
-        if check_credentials(id_num, hashed_password):
-            user_class = get_user_class_from_database(id_num)
-            if user_class == "Admin":
-                admin = Admin()
-                admin.openAdminWindow()
-                self.login_win.destroy()
-            else:
-                self.openUserWindow()
-        else:
-            messagebox.showerror("Error", "Invalid ID or password.")
-
-    def openUserWindow(self):
+        messagebox.showinfo("Success", "Login successful!")
+        self.clearFields()
         self.login_win.destroy()
-        user_window = tk.Tk()
-        # User window implementation
-        # ...
+        import user
+        user = user()
 
 
-class Admin:
-    def openAdminWindow(self):
-        admin_window = tk.Tk()
-        # Admin window implementation
-        # ...
+    def clearFields(self):
+        self.id_entry.delete(0, tk.END)
+        self.password_entry.delete(0, tk.END)
 
 
-def check_credentials(id_num, hashed_password):
-    # Check the credentials in the central database
-    # Replace this with your database query/lookup logic
-    # Return True if the credentials are valid, False otherwise
-    # ...
-    return True
 
-
-def get_user_class_from_database(id_num):
-    # Retrieve the user class from the central database based on the ID
-    # Replace this with your database query/lookup logic
-    # Return the user class
-    # ...
-    return "Student"
 
 
 login = Login()
