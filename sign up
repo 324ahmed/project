@@ -56,8 +56,10 @@ class SignUp:
         self.submit_button = tk.Button(self.signup_win, text="Submit", command=self.submitForm)
         self.submit_button.pack()
 
-        self.login_button = tk.Button(self.signup_win, text="Login", command=self.openLogin)
+        self.login_button = tk.Button(self.signup_win, text="Login", command=self.go_Login)
         self.login_button.pack()
+
+        self.signup_win.mainloop()
 
     def submitForm(self):
         first_name = self.first_name_entry.get()
@@ -112,64 +114,11 @@ class SignUp:
         self.email_entry.delete(0, tk.END)
         self.phone_entry.delete(0, tk.END)
 
-    def openLogin(self):
+    def go_Login(self):
         self.signup_win.destroy()
-        login = Login()
-        login.login_win.mainloop()
+        import Login
+        Login.Login()
 
 
-class Login:
-    def __init__(self):
-        self.login_win = tk.Tk()
-        self.login_win.title("Login")
-        self.login_win.geometry("300x300")
-
-        self.label_id = tk.Label(self.login_win, text="ID:")
-        self.label_id.pack()
-
-        self.id_entry = tk.Entry(self.login_win)
-        self.id_entry.pack()
-
-        self.label_password = tk.Label(self.login_win, text="Password:")
-        self.label_password.pack()
-
-        self.password_entry = tk.Entry(self.login_win, show="*")
-        self.password_entry.pack()
-
-        self.login_button = tk.Button(self.login_win, text="Login", command=self.login)
-        self.login_button.pack()
-
-        self.signup_button = tk.Button(self.login_win, text="Sign Up", command=self.openSignUp)
-        self.signup_button.pack()
-
-    def login(self):
-        id_num = self.id_entry.get()
-        password = self.password_entry.get()
-
-        # Validate input
-        if not id_num or not password:
-            messagebox.showerror("Error", "Please enter ID and password.")
-            return
-
-        # Connect to the central database and check if the user exists and the password is correct
-        # ...
-
-        # If login is successful, perform the necessary actions
-        # ...
-
-        messagebox.showinfo("Success", "Login successful!")
-        self.clearFields()
-
-    def clearFields(self):
-        self.id_entry.delete(0, tk.END)
-        self.password_entry.delete(0, tk.END)
-
-    def openSignUp(self):
-        self.login_win.destroy()
-        signup = SignUp()
-        signup.signup_win.mainloop()
-
-
-login = Login()
-login.login_win.mainloop()
-
+# Start the signup interface
+SignUp()
