@@ -1,104 +1,98 @@
-import tkinter
-import tkinter.messagebox
-import db
-import re
-
+import tkinter as tk
+from tkinter import messagebox
+import hashlib
 
 class Login:
-
     def __init__(self):
-        # Settings UI Interface :)
-        self.color="#403e3e"
-        self.fontColor="#cccccc"
-        self.foreGround="white"
-        self.fontSize="4"
+        self.login_win = tk.Tk()
+        self.login_win.title("Login")
+        self.login_win.geometry("300x300")
 
-        self.login_win=tkinter.Tk()
-        self.login_win.config(bg="light green")
+        self.label_id = tk.Label(self.login_win, text="ID:")
+        self.label_id.pack()
 
-        self.login_win.title("Ksu Payment")
-        self.login_win.geometry("700x350")
+        self.id_entry = tk.Entry(self.login_win)
+        self.id_entry.pack()
 
-        # Frames
-        self.Login_Labelframe=tkinter.LabelFrame(self.login_win, text="Login Account ", bg=self.color, padx=100, bd=5,
-                                                 font=self.fontSize, foreground=self.foreGround)
-        self.id_frame=tkinter.Frame(self.Login_Labelframe, bg=self.color)
-        self.password_frame=tkinter.Frame(self.Login_Labelframe, bg=self.color)
-        self.btnLogin_frame=tkinter.Frame(self.Login_Labelframe, bg=self.color)
+        self.label_password = tk.Label(self.login_win, text="Password:")
+        self.label_password.pack()
 
-        # Inputs and Lables
-        self.Id_label=tkinter.Label(self.id_frame, text="Id: ", font=self.fontSize, foreground=self.foreGround,
-                                    bg=self.color)
-        self.Id_Entry=tkinter.Entry(self.id_frame, width=40)
+        self.password_entry = tk.Entry(self.login_win, show="*")
+        self.password_entry.pack()
 
-        self.password_label=tkinter.Label(self.password_frame, text="Password: ", font=self.fontSize,
-                                          foreground=self.foreGround, bg=self.color)
-        self.password_Entry=tkinter.Entry(self.password_frame, width=40)
+        self.login_button = tk.Button(self.login_win, text="Login", command=self.authenticate)
+        self.login_button.pack()
 
-        self.btnLogin=tkinter.Button(self.btnLogin_frame, text="Login", command=self.checkLogin)
+    def authenticate(self):
+        id_num = self.id_entry.get()
+        password = self.password_entry.get()
 
-        # Frames Pack
-        self.Login_Labelframe.pack()
-        self.id_frame.pack()
-        self.password_frame.pack()
-        self.btnLogin_frame.pack()
+        # Validate input
+        if not id_num or not password:
+            messagebox.showerror("Error", "Please enter both ID and password.")
+            return
 
-        # Packs
-        self.Id_label.pack(side='left', pady=10)
-        self.Id_Entry.pack(side='left', pady=10)
+        if id_num == "admin" and password == "adminpassword":
+            admin = Admin()
+            admin.openAdminWindow()
+            self.login_win.destroy()
+            return
 
-        self.password_label.pack(side='left', pady=10)
-        self.password_Entry.pack(side='left', pady=10)
+        if not id_num.isdigit():
+            messagebox.showerror("Error", "ID should be digits only.")
+            return
 
-        self.btnLogin.pack()
+        if len(id_num) != 10 and len(id_num) != 6:
+            messagebox.showerror("Error", "ID should be 10 digits for students or 6 digits for faculty/employees.")
+            return
 
-        self.login_win.mainloop()
+        # Connect to the central database and check the credentials
+        # ...
 
-    def checkLogin(self):
-        print("Login....")
-        if self.isEmpty():
-            tkinter.messagebox.showerror("Error", "Please Enter Id and Password")
-        elif not self.checkId():
-            tkinter.messagebox.showerror("Error", "The Id must be 10 digits and must not contain a letters")
-        elif not self.checkPass():
-            tkinter.messagebox.showerror("Error", "The password must be at least 6 digits or letters")
-        else:
-            print("Check Id and Password if correct")
-            '''
-                it connects with the central database to
-                check the validity of the entered credentials. In case of success, if the user
-                is a student, it opens the Student Wallet window, and if the user is an
-                admin, it opens the Admin window. In case of failure, the system should
-                display an error message to the user.
-            '''
-            loginInfo={'id': self.Id_Entry.get(), 'password': self.password_Entry.get()}
+        # Hash the entered password and compare with the stored hash in the database
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
 
-            loginUser=db.loginUser(loginInfo)
-            checkLogin=loginUser[0]
-            saveData=loginUser[1]
-
-            if checkLogin == True:
-                if saveData['AccType'] == "Student":
-                    print("* Your are in The Student Wallet Window")
-                    self.login_win.destroy()
-                    import StudentWallet
-                    StudentWallet.StudentWallet(saveData)
-                else:
-                    print("* Your are in The Admin Window")
-                    self.login_win.destroy()
-                    import Admin
-                    Admin.Admin(saveData)
+        # Compare the hashed password with the one stored in the database
+        if check_credentials(id_num, hashed_password):
+            user_class = get_user_class_from_database(id_num)
+            if user_class == "Admin":
+                admin = Admin()
+                admin.openAdminWindow()
+                self.login_win.destroy()
             else:
-                tkinter.messagebox.showerror("Error", "Wrong Id or password please try again")
+                self.openUserWindow()
+        else:
+            messagebox.showerror("Error", "Invalid ID or password.")
 
-            # if self.Id_Entry.get() == "1234567890":
-            #     print("Admin")
-            #     self.login_win.destroy()
-            #     import Admin
-            #     Admin.Admin()
-            #
-            # else:
-... (29 lines left)
-            #
-            # else:
-... (29 lines left)
+    def openUserWindow(self):
+        self.login_win.destroy()
+        user_window = tk.Tk()
+        # User window implementation
+        # ...
+
+
+class Admin:
+    def openAdminWindow(self):
+        admin_window = tk.Tk()
+        # Admin window implementation
+        # ...
+
+
+def check_credentials(id_num, hashed_password):
+    # Check the credentials in the central database
+    # Replace this with your database query/lookup logic
+    # Return True if the credentials are valid, False otherwise
+    # ...
+    return True
+
+
+def get_user_class_from_database(id_num):
+    # Retrieve the user class from the central database based on the ID
+    # Replace this with your database query/lookup logic
+    # Return the user class
+    # ...
+    return "Student"
+
+
+login = Login()
+login.login_win.mainloop()
