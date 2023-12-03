@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 import datetime
-from Signup import SignUp  # Import the SignUp class from the Signup file
+
 
 class User:
     def __init__(self, user_type):
@@ -60,18 +60,18 @@ class User:
             messagebox.showinfo("Reservations", "No reservations found.")
 
     def logout(self):
-        # Close the current window
+
         window.destroy()
 
         # Create a new instance of the SignUp class to display the Signup window
+        from signup import SignUp
         signup_window = SignUp()
 
     def get_user_type(self):
         return self.user_type
 
     def check_cart_availability(self, college, start_time, end_time):
-        # Replace this example logic with your own cart availability check
-        # Example implementation (replace with your own logic)
+
         if college == "College of Science" and start_time.hour >= 8 and end_time.hour <= 16:
             return True
         elif college == "College of Computer Science and Information" and start_time.hour >= 9 and end_time.hour <= 17:
@@ -86,40 +86,55 @@ class User:
         reservation = {"start_time": start_time, "end_time": end_time}
         self.reservations.append(reservation)
 
-# Create the main window
+
 window = tk.Tk()
 window.title("KSUGolfCarts")
 
 # Create the college selection dropdown
-colleges = ["College of Science", "College of Computer Science and Information", "College of Engineering"]  # Replace with actual college names
+import CentralDatabase as cd
+
+cursor = cd.conn.cursor()
+
+
+cursor.execute('SELECT College FROM GOLF_CART')
+
+
+rows = cursor.fetchall()
+
+
+colleges = []
+depts = ('IS', 'CS', 'CE', 'IT', 'SE')
+for row in rows:
+    colleges.append(row[0])
+
+
+
+
 college_var = tk.StringVar()
+
+
 college_dropdown = tk.OptionMenu(window, college_var, *colleges)
 college_dropdown.pack()
 
-# Create start time input field
 start_time_label = tk.Label(window, text="Enter start time and date of the reservation (YYYY-MM-DD HH:MM:SS):")
 start_time_label.pack()
 start_time_entry = tk.Entry(window, bd=5)
 start_time_entry.pack()
 
-# Create end time input field
 end_time_label = tk.Label(window, text="Enter end time and date of thereservation (YYYY-MM-DD HH:MM:SS):")
 end_time_label.pack()
 end_time_entry = tk.Entry(window, bd=5)
 end_time_entry.pack()
 
-# Create the user object
-user = User("Employee")  # Replace "Employee" with the actual user type
 
-# Create the reserve cart button
+user = User("Employee") 
+
 reserve_cart_button = tk.Button(window, text="Reserve Cart", command=user.reserve_cart)
 reserve_cart_button.pack()
 
-# Create the show reservations button
 show_reservations_button = tk.Button(window, text="Show Reservations", command=user.show_reservations)
 show_reservations_button.pack()
 
-# Create the logout button
 logout_button = tk.Button(window, text="Logout", command=user.logout)
 logout_button.pack()
 
