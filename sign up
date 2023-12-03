@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 import hashlib
+import sqlite3
 
 
 class SignUp:
@@ -61,7 +62,7 @@ class SignUp:
 
         self.signup_win.mainloop()
 
-        def submitForm(self):
+    def submitForm(self):
         first_name = self.first_name_entry.get()
         last_name = self.last_name_entry.get()
         user_class = self.user_class_var.get()
@@ -121,10 +122,9 @@ class SignUp:
 
     def go_Login(self):
         self.signup_win.destroy()
-        import Login
-        Login.Login()
+        import login
+        login.Login()
 
 
 # Start the signup interface
 SignUp()
-
