@@ -61,7 +61,7 @@ class SignUp:
 
         self.signup_win.mainloop()
 
-    def submitForm(self):
+        def submitForm(self):
         first_name = self.first_name_entry.get()
         last_name = self.last_name_entry.get()
         user_class = self.user_class_var.get()
@@ -99,9 +99,14 @@ class SignUp:
 
         # Hash the password
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
+        import CentralDatabase as cd
+        try:
 
-        # Insert user information into the database
-        # ...
+          cd.cursor.execute('''INSERT INTO ACCOUNT (ID,FirstName,LastName,Password,email,PhoneNum)VALUES(?,?,?,?,?,?)''',(first_name,last_name,id_num,password,email,phone))
+          cd.conn.commit()
+          print("yes")
+        except sqlite3.Error as e:
+            print("Error: ", e)
 
         messagebox.showinfo("Success", "Registration successful!")
         self.clearFields()
