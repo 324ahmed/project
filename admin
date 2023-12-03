@@ -73,55 +73,18 @@ class Admin:
             if conn:
                 conn.close()
 
-def create_tables():
-    conn = sqlite3.connect("KSU_payment.db")
-    print("Opened database successfully")
-
-    try:
-        conn.executescript('''
-            CREATE TABLE IF NOT EXISTS ACCOUNT
-            ( 
-                ID          TEXT     NOT NULL,
-                FirstName   TEXT     NOT NULL,
-                LastName    TEXT     NOT NULL,
-                Password    TEXT     NOT NULL,
-                email       TEXT     NOT NULL,
-                PhoneNum    VARCHAR(10) NOT NULL,
-                AccType     VARCHAR(20) NOT NULL,
-                PRIMARY KEY (ID),
-                UNIQUE(email),
-                UNIQUE(PhoneNum) 
-            );
-
-            CREATE TABLE IF NOT EXISTS GOLF_CART
-            ( 
-                PlateNumber TEXT     NOT NULL, 
-                College     TEXT     NOT NULL,
-                PRIMARY KEY (PlateNumber)
-            );
-        ''')
-        print("Tables created successfully")
-        conn.close()
-    except sqlite3.Error as e:
-        print("Error: ", e)
-
 def create(plate_number, college):
-    conn = sqlite3.connect("KSU_payment.db")
-    print("Opened database successfully")
-
+    import CentralDatabase as cd
     try:
-        conn.execute("INSERT INTO GOLF_CART (PlateNumber, College) VALUES (?, ?)",
+        cd.cursor.execute("INSERT INTO GOLF_CART (PlateNumber, College) VALUES (?, ?)",
                      (plate_number, college))
-        conn.commit()
+        cd.conn.commit()
 
         print("Data sent to the database successfully")
     except sqlite3.Error as e:
         print("Error: ", e)
 
-    conn.close()
-
-# Create the tables if they don't exist
-create_tables()
+    cd.conn.close()
 
 # Start the admin interface
 Admin()
