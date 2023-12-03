@@ -25,13 +25,17 @@ class Login:
 
 
     def login(self):
-        id_num = self.id_entry.get()
-        password = self.password_entry.get()
+        import CentralDatabase as cd
+        id_num=self.id_entry.get()
+        password=self.password_entry.get()
+        cur=cd.conn.cursor()
+        rows=cur.execute("SELECT * FROM ACCOUNT")
 
-        # Validate input
-        if not id_num or not password:
-            messagebox.showerror("Error", "Please enter ID and password.")
-            return
+        for row in rows:
+
+            if(row[2]==id_num or row[3]==password):
+                print("true")
+
 
 
         if id_num == "admin" and password == "adminpassword":
@@ -40,11 +44,12 @@ class Login:
             admin_instance = admin.Admin()
             return
 
+
         messagebox.showinfo("Success", "Login successful!")
         self.clearFields()
         self.login_win.destroy()
-        import user
-        user = user()
+        import User
+        User = user()
 
 
     def clearFields(self):
