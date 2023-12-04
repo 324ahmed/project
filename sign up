@@ -8,6 +8,7 @@ class SignUp:
     def __init__(self):
         self.signup_win = tk.Tk()
         self.signup_win.title("Sign Up")
+        self.signup_win.configure(bg='#374aa1')
         self.signup_win.geometry("300x400")
 
         self.label_first_name = tk.Label(self.signup_win, text="First Name:")
@@ -103,7 +104,7 @@ class SignUp:
         import CentralDatabase as cd
         try:
 
-          cd.cursor.execute('''INSERT INTO ACCOUNT (ID,FirstName,LastName,Password,email,PhoneNum)VALUES(?,?,?,?,?,?)''',(first_name,last_name,id_num,password,email,phone))
+          cd.cursor.execute('''INSERT INTO ACCOUNT (ID,FirstName,LastName,Password,email,PhoneNum)VALUES(?,?,?,?,?,?)''',(id_num,first_name,last_name,password,email,phone))
           cd.conn.commit()
           print("yes")
         except sqlite3.Error as e:
