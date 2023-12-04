@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 import datetime
-
+  # Import the SignUp class from the Signup file
 
 class User:
     def __init__(self, user_type):
@@ -14,9 +14,23 @@ class User:
 
     def reserve_cart(self):
         college = college_var.get()
-        start_time = start_time_entry.get()
-        end_time = end_time_entry.get()
 
+        cd.cursor.execute('''SELECT PlateNumber FROM RESERVATION WHERE PlateNumber = ?''', (college,))
+        result=cd.cursor.fetchone()
+
+        if result is not None:
+            # PlateNumber exists in the RESERVATION table
+            print("PlateNumber exists")
+            cd.cursor.execute("INSERT INTO RESERVATION (College) VALUES (?)", (college,))
+            cd.conn.commit()
+            #cd.cursor.execute('''INSERT INTO RESERVATION (AccountID)VALUES(?)''', (a,))
+        else:
+            # PlateNumber does not exist in the RESERVATION table
+            print("PlateNumber does not exist")
+
+
+
+        cd.conn.commit()
         try:
             start_time = datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S")
             end_time = datetime.datetime.strptime(end_time, "%Y-%m-%d %H:%M:%S")
@@ -61,6 +75,7 @@ class User:
 
     def logout(self):
 
+        # Close the current window
         window.destroy()
 
         # Create a new instance of the SignUp class to display the Signup window
@@ -70,23 +85,18 @@ class User:
     def get_user_type(self):
         return self.user_type
 
-    def check_cart_availability(self, college, start_time, end_time):
-
-        if college == "College of Science" and start_time.hour >= 8 and end_time.hour <= 16:
-            return True
-        elif college == "College of Computer Science and Information" and start_time.hour >= 9 and end_time.hour <= 17:
-            return True
-        elif college == "College of Engineering" and start_time.hour >= 10 and end_time.hour <= 18:
-            return True
-        else:
-            return False
+    def check_cart_availability(self):
+        # Replace this example logic with your own cart availability check
+        # Example implementation (replace with your own logic)
+        import login
+        import CentralDatabase as cd
 
     def reserve_cart_in_database(self, college, start_time, end_time):
         # Implement cart reservation in the database
         reservation = {"start_time": start_time, "end_time": end_time}
         self.reservations.append(reservation)
 
-
+# Create the main window
 window = tk.Tk()
 window.title("KSUGolfCarts")
 
@@ -95,46 +105,48 @@ import CentralDatabase as cd
 
 cursor = cd.conn.cursor()
 
-
+# Execute the query
 cursor.execute('SELECT College FROM GOLF_CART')
 
-
+# Fetch all the rows
 rows = cursor.fetchall()
-
-
-colleges = []
 depts = ('IS', 'CS', 'CE', 'IT', 'SE')
-for row in rows:
-    colleges.append(row[0])
 
+# Create a list to store college names
+temp = [row[0] for row in rows]
+colleges = list(set(temp))
 
-
-
+# Create a Tkinter StringVar to store the selected college
 college_var = tk.StringVar()
 
-
+# Create the college dropdown menu
 college_dropdown = tk.OptionMenu(window, college_var, *colleges)
 college_dropdown.pack()
 
+# Create start time input field
 start_time_label = tk.Label(window, text="Enter start time and date of the reservation (YYYY-MM-DD HH:MM:SS):")
 start_time_label.pack()
 start_time_entry = tk.Entry(window, bd=5)
 start_time_entry.pack()
 
+# Create end time input field
 end_time_label = tk.Label(window, text="Enter end time and date of thereservation (YYYY-MM-DD HH:MM:SS):")
 end_time_label.pack()
 end_time_entry = tk.Entry(window, bd=5)
 end_time_entry.pack()
 
+# Create the user object
+user = User("Employee")  # Replace "Employee" with the actual user type
 
-user = User("Employee") 
-
+# Create the reserve cart button
 reserve_cart_button = tk.Button(window, text="Reserve Cart", command=user.reserve_cart)
 reserve_cart_button.pack()
 
+# Create the show reservations button
 show_reservations_button = tk.Button(window, text="Show Reservations", command=user.show_reservations)
 show_reservations_button.pack()
 
+# Create the logout button
 logout_button = tk.Button(window, text="Logout", command=user.logout)
 logout_button.pack()
 
