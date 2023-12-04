@@ -27,6 +27,17 @@ cursor.execute('''
                 PRIMARY KEY (PlateNumber)
             );
         ''')
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS RESERVATION(
+        ReservationID INTEGER PRIMARY KEY AUTOINCREMENT,
+        AccountID TEXT,
+        PlateNumber TEXT,
+        College TEXT,
+        FOREIGN KEY (AccountID) REFERENCES ACCOUNT(ID),
+        FOREIGN KEY (PlateNumber, College) REFERENCES GOLF_CART(PlateNumber, College),
+        UNIQUE(AccountID)
+    )
+''')
 
 conn.commit()
 
